@@ -14,108 +14,20 @@ namespace d_f_32.KanColleCacher
     [Serializable]
     public class Settings :NotificationObject
     {
-        private static string filePath;
-
-        public static Settings Current { get; private set; }
-
-        /// <summary>
-        /// 加载插件设置
-        /// </summary>
-        public static void Load()
-        {
-			var switch_on = 0;
-
-SwitchCase:
-			switch (switch_on)
+		private static Settings _Current;
+        public static Settings Current {
+			get
 			{
-				case 0:
-					goto SetPath1;
-
-				//第一次读取失败
-				case 1:
-					goto SetPath2;
-
-				//第二次读取失败
-				case 2:
-					goto Failed;
+				if (_Current == null)
+					_Current = new Settings();
+				return _Current;
 			}
-goto Failed;
-
-
-SetPath1:
-			filePath = Directory.GetCurrentDirectory() + @"\Plugins\KanColleCacher.xml";
-
-switch_on = 1;
-goto ReadFile;
-
-
-SetPath2:
-			filePath = Path.Combine(
-						Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-						"grabacr.net",
-						"KanColleViewer",
-						"KanColleCacher.xml"
-						);
-switch_on = 2;
-goto ReadFile;
-
-
-ReadFile:
-			if (File.Exists(filePath))
-			{
-				try
-				{
-					Current = filePath.ReadXml<Settings>();
-					goto Succeed;
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex.InnerException, ex, "读取设置文件时出现异常");
-				}
-			}
-goto SwitchCase;
-			
-
-Failed:
-			Current = new Settings();
-return;
-
-
-Succeed:
-			if (!Directory.Exists(Current.CacheFolder))
-			{
-				try
-				{
-					Directory.CreateDirectory(Current.CacheFolder);
-				}
-				catch (Exception ex)
-				{
-					Current.CacheFolder = Directory.GetCurrentDirectory() + @"\MyCache";
-					Log.Exception(ex.InnerException, ex, "设置文件中CacheFolder不存在，试图创建时发生异常");
-				}
-			}
-return;
-        }
-        
-        /// <summary>
-        /// 保存设置
-        /// </summary>
-        public static void Save()
-        {
-            try
-            {
-                Current.WriteXml(filePath);
-            }
-            catch (Exception ex)
-            {
-				Log.Exception(ex.InnerException, ex, "保存设置文件时出现异常");
-            }
-        }
-
+			private set { _Current = value; }
+		}
         
         public Settings ()
         {       
-                _CacheFolder = Directory.GetCurrentDirectory() + @"\MyCache";
+                _CacheFolder = Directory.GetCurrentDirectory() + @"\Cache";
                 _CacheEnabled = true;
                 _HackEnabled = true;
                 _HackTitleEnabled = true;
@@ -130,8 +42,6 @@ return;
 				_PrintGraphList = true;
          }
        
-
-
         private string _CacheFolder;
 		/// <summary>
 		/// 缓存文件夹
