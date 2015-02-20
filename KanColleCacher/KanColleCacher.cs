@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using Debug = System.Diagnostics.Debug;
 using File = System.IO.File;
+using Directory = System.IO.Directory;
 
 namespace d_f_32.KanColleCacher
 {
@@ -22,6 +23,9 @@ KanColleCacher
 CACHR>	初始化开始：{0}
 ", System.DateTime.Now);
 #endif
+
+			if (!File.Exists(Settings.Current.CacheFolder))
+				Directory.CreateDirectory(Settings.Current.CacheFolder);
 			
 			Debug.WriteLine(@"CACHR>	GraphList加入规则");
 
